@@ -1,14 +1,20 @@
-
 import React, { useState } from 'react';
-import ProductGrid from '../components/ProductGrid';
+import { Scan, User } from 'lucide-react';
+import ProductGrid, { getProducts } from '../components/ProductGrid';
 import Cart from '../components/Cart';
 import PaymentModal from '../components/PaymentModal';
-import { CartItem, Product } from '../types/pos';
+import BarcodeScanner from '../components/BarcodeScanner';
+import CustomerManager from '../components/CustomerManager';
+import { Button } from '@/components/ui/button';
+import { CartItem, Product, Customer } from '../types/pos';
 
 const Index = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<number | null>(null);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
+  const [isCustomerManagerOpen, setIsCustomerManagerOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const addToCart = (product: Product) => {
     setCartItems(prev => {
@@ -56,6 +62,7 @@ const Index = () => {
     const orderNumber = Math.floor(Math.random() * 10000) + 1000;
     setCurrentOrder(orderNumber);
     clearCart();
+    setSelectedCustomer(null);
     setIsPaymentModalOpen(false);
     
     // Show success message for 3 seconds
@@ -74,6 +81,26 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">POS System</h1>
             <div className="flex items-center space-x-4">
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsBarcodeScannerOpen(true)}
+                  className="flex items-center"
+                >
+                  <Scan className="w-4 h-4 mr-2" />
+                  Scan
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsCustomerManagerOpen(true)}
+                  className="flex items-center"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  {selectedCustomer ? selectedCustomer.name : 'Customer'}
+                </Button>
+              </div>
               <div className="text-sm text-gray-600">
                 {new Date().toLocaleDateString()} • {new Date().toLocaleTimeString()}
               </div>
@@ -106,6 +133,22 @@ const Index = () => {
           />
         </div>
       </div>
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScanner
+        isOpen={isBarcodeScannerOpen}
+        onClose={() => setIsBarcodeScannerOpen(false)}
+        onProductFound={addToCart}
+        products={getProducts()}
+      />
+
+      {/* Customer Manager Modal */}
+      <CustomerManager
+        isOpen={isCustomerManagerOpen}
+        onClose={() => setIsCustomerManagerOpen(false)}
+        onCustomerSelect={setSelectedCustomer}
+        selectedCustomer={selectedCustomer}
+      />
 
       {/* Payment Modal */}
       <PaymentModal
