@@ -26,3 +26,10 @@ export interface Customer {
   email: string;
   phone: string;
 }
+
+export interface Deliverer {
+  id: string;
+  name: string;
+  phone: string;
+  vehicle?: string;
+}

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Scan, User } from 'lucide-react';
+import { Scan, User, Truck } from 'lucide-react';
 import ProductGrid, { getProducts } from '../components/ProductGrid';
 import Cart from '../components/Cart';
 import PaymentModal from '../components/PaymentModal';
 import BarcodeScanner from '../components/BarcodeScanner';
 import CustomerManager from '../components/CustomerManager';
+import DelivererManager from '../components/DelivererManager';
 import { Button } from '@/components/ui/button';
-import { CartItem, Product, Customer } from '../types/pos';
+import { CartItem, Product, Customer, Deliverer } from '../types/pos';
 
 const Index = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -14,7 +15,9 @@ const Index = () => {
   const [currentOrder, setCurrentOrder] = useState<number | null>(null);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
   const [isCustomerManagerOpen, setIsCustomerManagerOpen] = useState(false);
+  const [isDelivererManagerOpen, setIsDelivererManagerOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedDeliverer, setSelectedDeliverer] = useState<Deliverer | null>(null);
 
   const addToCart = (product: Product) => {
     setCartItems(prev => {
@@ -63,6 +66,7 @@ const Index = () => {
     setCurrentOrder(orderNumber);
     clearCart();
     setSelectedCustomer(null);
+    setSelectedDeliverer(null);
     setIsPaymentModalOpen(false);
     
     // Show success message for 3 seconds
@@ -98,7 +102,16 @@ const Index = () => {
                   className="flex items-center"
                 >
                   <User className="w-4 h-4 mr-2" />
-                  {selectedCustomer ? selectedCustomer.name : 'Customer'}
+                  {selectedCustomer ? selectedCustomer.name : 'Customer (Optional)'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDelivererManagerOpen(true)}
+                  className="flex items-center"
+                >
+                  <Truck className="w-4 h-4 mr-2" />
+                  {selectedDeliverer ? selectedDeliverer.name : 'Deliverer (Optional)'}
                 </Button>
               </div>
               <div className="text-sm text-gray-600">
@@ -148,6 +161,14 @@ const Index = () => {
         onClose={() => setIsCustomerManagerOpen(false)}
         onCustomerSelect={setSelectedCustomer}
         selectedCustomer={selectedCustomer}
+      />
+
+      {/* Deliverer Manager Modal */}
+      <DelivererManager
+        isOpen={isDelivererManagerOpen}
+        onClose={() => setIsDelivererManagerOpen(false)}
+        onDelivererSelect={setSelectedDeliverer}
+        selectedDeliverer={selectedDeliverer}
       />
 
       {/* Payment Modal */}
